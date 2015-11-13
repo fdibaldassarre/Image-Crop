@@ -27,9 +27,6 @@ RESIZE_BOTTOM = 8
 
 MIN_WIDTH = 20
 
-RATIO_19_9 = 2.111
-RATIO_4_3 = 1.333
-
 class Interface():
 
   def __init__(self, imagepath):
@@ -82,7 +79,7 @@ class Interface():
       controls = self.builder.get_object('ControlsGrid')
       controls.hide()
       self.main_window.set_title('Error loading image')
-      self.main_window.set_size_request(200, 200)
+      self.main_window.set_size_request(20, 20)
     else:
       overlay = self.builder.get_object('Overlay')
       allocation = overlay.get_allocation()
@@ -246,7 +243,7 @@ class Interface():
       self.selector_width = width
       self.selector_height = height
       self.selector.set_size_request(self.selector_width, self.selector_height)
-  
+
   def getSelectorValidWidth(self, width):
     if width <= 0:
       width = 1
@@ -266,7 +263,6 @@ class Interface():
     self.selector_x = x
     self.selector_y = y
     self.overlay.move(self.selector, x, y)
-    #if self.validSelectorPosition(x, y):
       
   def validSelectorSizes(self, width, height):
     return width >= 0 and self.selector_x + width <= self.max_width and \
@@ -371,20 +367,40 @@ class Interface():
       new_width = self.selector_width + delta_x
       self.setSelectorWidth(new_width)
     elif self.resize == RESIZE_TOP:
-      new_y = self.selector_y + delta_y
-      new_height = self.selector_height - delta_y
-      self.moveSelector(self.selector_x, new_y)
-      if self.selector_y == new_y:
-        self.setSelectorHeight(new_height)
+      self.resizeTop(delta_x, delta_y)
     elif self.resize == RESIZE_LEFT:
-      new_x = self.selector_x + delta_x
-      new_width = self.selector_width - delta_x
-      self.moveSelector(new_x, self.selector_y)
-      if self.selector_x == new_x:
-        self.setSelectorWidth(new_width)
+      self.resizeLeft(delta_x, delta_y)
     # set new start position
     self.resize_start_point = end_pos
-    
+  
+  def resizeLeft(self, delta_x, delta_y):
+    new_x = self.selector_x + delta_x
+    new_width = self.selector_width - delta_x
+    if delta_x < 0:
+      # move and resize
+      self.moveSelector(new_x, self.selector_y)
+      if new_x == self.selector_x:
+        self.setSelectorWidth(new_width)
+    else:
+      # resize and move
+      self.setSelectorWidth(new_width)
+      if self.selector_width == new_width:
+        self.moveSelector(new_x, self.selector_y)
+  
+  def resizeTop(self, delta_x, delta_y):
+    new_y = self.selector_y + delta_y
+    new_height = self.selector_height - delta_y
+    if delta_y > 0:
+      # resize and move
+      self.setSelectorHeight(new_height)
+      if new_height == self.selector_height:
+        self.moveSelector(self.selector_x, new_y)
+    else:
+      # move and resize
+      self.moveSelector(self.selector_x, new_y)
+      if new_y == self.selector_y:
+        self.setSelectorHeight(new_height)
+      
   def setPointerDrag(self, set_drag):
     if set_drag:
       self.changeCursorType(Gdk.CursorType.FLEUR)
