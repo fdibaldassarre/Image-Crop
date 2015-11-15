@@ -90,18 +90,6 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="SaveButton">
-                    <property name="label" translatable="yes">Save</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">3</property>
-                    <property name="top_attach">0</property>
-                  </packing>
-                </child>
-                <child>
                   <object class="GtkSeparator" id="ControlsSeparator">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -113,13 +101,25 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkColorButton" id="ChooseColourButton">
+                  <object class="GtkButton" id="SaveButton">
+                    <property name="label" translatable="yes">Save</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">5</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkColorButton" id="ChooseColourButton">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">3</property>
                     <property name="top_attach">0</property>
                   </packing>
                 </child>
