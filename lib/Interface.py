@@ -557,28 +557,19 @@ class Interface():
   def setupRatioSelector(self): 
     ratio_entry = self.builder.get_object('RatioEntry')
     ratio_width, ratio_height = self.selector.getRatio()
-    if ratio_width == 16:
-      active = 0
-    elif ratio_width == 4:
-      active = 1
-    else:
-      active = 2
-    ratio_entry.set_active(active)
+    ratio_txt = str(ratio_width) + ':' + str(ratio_height)
+    ratio_entry.set_active_id(ratio_txt)
     ratio_entry.connect('changed', self.onRatioChanged)
   
   def onRatioChanged(self, widget):
     model = widget.get_model()
     index = widget.get_active()
     el = model[index][0]
-    if el == 0:
-      # ratio 16:9
-      self.selector.setRatio(16, 9)
-    elif el == 1:
-      # ratio 4:3
-      self.selector.setRatio(4, 3)
-    elif el == 2:
-      # ratio 1:1
-      self.selector.setRatio(1, 1)
+    ratio_txt = model[index][1]
+    width, height = ratio_txt.split(':')
+    width = int(width)
+    height = int(height)
+    self.selector.setRatio(width, height)
     # check selector ratio
     self.selector.checkRatio()
   
