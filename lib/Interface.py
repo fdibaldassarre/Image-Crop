@@ -505,12 +505,13 @@ class Interface():
     self.config[CONFIG_SECTION][param] = str(value)
   
   def saveSettings(self):
-    # read current settings
-    self.setConfigRatio()
-    self.setConfigFixRatio()
-    self.setConfigSelectorColour()
-    # save
-    self.config.write(open(self.config_file, 'w'))
+    if not self.load_error:
+      # read current settings
+      self.setConfigRatio()
+      self.setConfigFixRatio()
+      self.setConfigSelectorColour()
+      # save
+      self.config.write(open(self.config_file, 'w'))
   
   # GET CONFIG
   def getConfigRatio(self):
@@ -660,7 +661,7 @@ class Interface():
   def getOverlayRelativeCoordinates(self, x, y):
     overlay = self.builder.get_object('Overlay')
     alloc = overlay.get_allocation()
-    return x, y - alloc.y
+    return x - alloc.x, y - alloc.y
   
   def startDrag(self, widget, event):
     x, y = self.getOverlayRelativeCoordinates(event.x, event.y)
