@@ -1,7 +1,21 @@
 # Image-Crop
 
-Simple GTK application to crop images for Debian.
+Simple GTK application to crop images.
 
-Requirements: python3 python3-pil python3-gi gir1.2-gtk-3.0
+## Requirements
+- Python 3 
+- PIL 
+- Gtk 3.0
 
-Usage: ./crop.py /path/to/image
+To install all the dependencies on Debian run
+
+```sh
+sudo apt-get install python3 python3-gi python3-pil gir1.2-gtk-3.0
+```
+
+## Usage 
+
+```sh
+./crop.py /path/to/image
+```
+
