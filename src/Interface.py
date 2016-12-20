@@ -601,21 +601,39 @@ class Interface():
     self.selector.setColour((r,g,b))
   
   ## INTERFACE - INFO LABEL
-  def showInfoMessage(self, message, duration=3000):
-    label = self.builder.get_object('InfoBarLabel')
-    label.set_text(message)
-    self.showInfoBar()
+  def showInfoMessage(self, message, duration=2000):
+    # InfoBar behaviour depends on the Gtk version in use...
+    if Gtk.MAJOR_VERSION == 3 and Gtk.MINOR_VERSION < 20:
+      self.showInfoBarFallback(message)
+    else:
+      label = self.builder.get_object('InfoBarLabel')
+      label.set_text(message)
+      self.showInfoBar()
     if duration is not None:
       GObject.timeout_add(duration, self.hideInfoBar)
   
   def showInfoBar(self, *args):
     bar = self.builder.get_object('InfoBar')
-    bar.show_all()
+    bar.get_action_area().show()
+    bar.get_content_area().show()
     return False
   
   def hideInfoBar(self, *args):
     bar = self.builder.get_object('InfoBar')
-    bar.hide()
+    bar.get_action_area().hide()
+    bar.get_content_area().hide()
+    self.hideInfoBarFallback()
+    return False
+  
+  def showInfoBarFallback(self, message):
+    fb = self.builder.get_object('InfoBarFallback')
+    fb.set_text(message)
+    fb.show()
+    return False
+  
+  def hideInfoBarFallback(self, *args):
+    fb = self.builder.get_object('InfoBarFallback')
+    fb.hide()
     return False
     
     
@@ -805,4 +823,8 @@ class Interface():
     #print('Saving: ' + savepath)
     new_img.save(savepath)
     self.showInfoMessage('Image saved as ' + savename)
-    
+
+
+def start(*args, **kwargs):
+  interface = Interface(*args, **kwargs)
+  return interface
