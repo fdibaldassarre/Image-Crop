@@ -2,6 +2,7 @@
 
 import os
 import configparser
+import math
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -49,7 +50,7 @@ CONFIG_DEFAULT = {'RatioWidth' : '16',
 
 ## SELECTOR
 class Selector():
-  
+
   def __init__(self, interface):
     self.interface = interface
     # selector data
@@ -68,7 +69,7 @@ class Selector():
     self.selector = self.interface.builder.get_object('Selector')
     self.setWidth(self.width)
     self.selector.connect('draw', self.draw)
-  
+
   def draw(self, widget, cr):
     r, g, b = self.colour
     r_i = min(r + 0.2, 1)
@@ -93,37 +94,37 @@ class Selector():
     cr.rectangle(BORDER_SIZE, BORDER_SIZE, self.width-2*BORDER_SIZE, self.height-2*BORDER_SIZE)
     cr.fill()
     return False
-  
+
   # GET
   def getPosition(self):
     return self.x, self.y
-  
+
   def getSize(self):
     return self.width, self.height
-  
+
   def getColour(self):
     return self.colour
-  
+
   def getRatio(self):
     return self.ratio_width, self.ratio_height
-  
+
   def getFixRatio(self):
     return self.fix_ratio
-  
+
   def getValidWidth(self, width):
     if width <= 0:
       width = 1
     elif self.x + width > self.max_width:
       width = self.max_width - self.x
     return width
-  
+
   def getValidHeight(self, height):
     if height <= 0:
       height = 1
     elif self.y + height > self.max_height:
       height = self.max_height - self.y
     return height
-  
+
   def getValidPosition(self, x, y):
     if x < 0:
       x = 0
@@ -134,7 +135,7 @@ class Selector():
     elif y + self.height > self.max_height:
       y = self.max_height - self.height
     return x, y
-  
+
   def getResizeType(self, x, y):
     width, height = self.width, self.height
     frame_x, frame_y = self.x, self.y
@@ -168,44 +169,44 @@ class Selector():
       else:
         resize = RESIZE_NONE
     return resize
-  
+
   # CHECK
   def checkRatio(self):
     # TODO: better
     self.setWidth(self.width)
     self.setHeight(self.height)
-  
+
   def isValidPosition(self, x, y):
     return x >= 0 and x + self.width <= self.max_width and \
            y >= 0 and y + self.height <= self.max_height
-  
+
   def isPositionInternal(self, x, y):
     return x >= self.x and x <= self.x + self.width and \
            y >= self.y and y <= self.y + self.height
-  
-     
+
+
   # SET
   def setSizeMin(self, size):
     self.min_size = size
-  
+
   def setSizeMax(self, width, height):
     self.max_width = width
     self.max_height = height
-  
+
   def setRatio(self, ratio_width, ratio_height):
     self.ratio_width = ratio_width
     self.ratio_height = ratio_height
-  
+
   def fixRatio(self, fix=True):
     self.fix_ratio = fix
-  
+
   def setColour(self, colour):
     self.colour = colour
-  
+
   def set(self, x, y, width, height):
     self.moveTo(x, y)
     self.setSize(width, height)
-  
+
   def setWidth(self, width):
     width = self.getValidWidth(width)
     if self.fix_ratio:
@@ -215,7 +216,7 @@ class Selector():
     if width >= self.min_size and height >= self.min_size and \
        self.x + width <= self.max_width and self.y + height <= self.max_height:
       self.setSize(width, height)
-  
+
   def setHeight(self, height):
     height = self.getValidHeight(height)
     if self.fix_ratio:
@@ -225,22 +226,22 @@ class Selector():
     if width >= self.min_size and height >= self.min_size and \
        self.x + width <= self.max_width and self.y + height <= self.max_height:
       self.setSize(width, height)
-  
+
   def setSize(self, width, height):
     self.width = width
     self.height = height
     self.selector.set_size_request(self.width, self.height)
-  
+
   # MOVE
   def move(self, x, y):
     x, y = self.getValidPosition(x, y)
     self.moveTo(x, y)
-  
+
   def moveTo(self, x, y):
     self.x = x
     self.y = y
     self.interface.overlay.move(self.selector, x, y)
-    
+
   # RESIZE
   def resizeBottom(self, x, y):
     y = y + RESIZE_CORRECTION
@@ -256,7 +257,7 @@ class Selector():
     start_x = x_s
     start_y = y_s
     self.set(start_x, start_y, width, height)
-  
+
   def resizeTop(self, x, y):
     y = y - RESIZE_CORRECTION
     y_e = self.y + self.height
@@ -272,7 +273,7 @@ class Selector():
     start_x = x_s
     start_y = y_s
     self.set(start_x, start_y, width, height)
-  
+
   def resizeRight(self, x, y):
     x = x + RESIZE_CORRECTION
     x_s = self.x
@@ -287,7 +288,7 @@ class Selector():
     start_x = x_s
     start_y = y_s
     self.set(start_x, start_y, width, height)
-  
+
   def resizeLeft(self, x, y):
     x = x - RESIZE_CORRECTION
     x_e = self.x + self.width
@@ -303,7 +304,7 @@ class Selector():
     start_x = x_s
     start_y = y_s
     self.set(start_x, start_y, width, height)
-  
+
   def resizeTopLeft(self, x, y):
     x_e = self.x + self.width
     y_e = self.y + self.height
@@ -317,7 +318,7 @@ class Selector():
     start_x = x_e - width
     start_y = y_e - height
     self.set(start_x, start_y, width, height)
-  
+
   def resizeTopRight(self, x, y):
     x_s = self.x
     y_e = self.y + self.height
@@ -331,7 +332,7 @@ class Selector():
     start_x = x_s
     start_y = y_e - height
     self.set(start_x, start_y, width, height)
-  
+
   def resizeBottomLeft(self, x, y):
     x_e = self.x + self.width
     y_s = self.y
@@ -345,7 +346,7 @@ class Selector():
     start_x = x_e - width
     start_y = y_s
     self.set(start_x, start_y, width, height)
-  
+
   def resizeBottomRight(self, x, y):
     x_s = self.x
     y_s = self.y
@@ -359,7 +360,7 @@ class Selector():
     start_x = x_s
     start_y = y_s
     self.set(start_x, start_y, width, height)
-  
+
   # FITTING
   def fitToArea(self, area_width, area_height):
     if self.fix_ratio:
@@ -377,7 +378,7 @@ class Selector():
       height = area_height
       width = area_width
     return width, height
-  
+
   def fitWidth(self, width):
     if not self.fix_ratio:
       return self.x, self.width
@@ -396,7 +397,7 @@ class Selector():
       x_e = self.max_width
       x_s = self.max_width - width
     return x_s, width
-  
+
   def fitHeight(self, height):
     if not self.fix_ratio:
       return self.y, self.height
@@ -415,7 +416,7 @@ class Selector():
       y_e = self.max_height
       y_s = self.max_height - height
     return y_s, height
-  
+
 ## INTERFACE
 class Interface():
 
@@ -433,7 +434,7 @@ class Interface():
       self.setupAll()
     else:
       self.load_error = True
-  
+
   def setupAll(self):
     image_name = os.path.basename(self.imagepath)
     self.main_window.set_title(image_name)
@@ -453,8 +454,8 @@ class Interface():
     self.setupFixRatio()
     self.setupSaveButton()
     self.setupColourChooser()
-  
-  
+
+
   def show(self):
     self.main_window.show_all()
     self.hideInfoBar()
@@ -471,16 +472,16 @@ class Interface():
       # set selector to 1/2 image width
       self.selector.setWidth(max_width / 2)
       self.selector.setHeight(max_height / 2)
-  
+
   def start(self):
     self.show()
     Gtk.main()
-  
+
   def close(self, *args):
     self.saveSettings()
     Gtk.main_quit()
-  
-  
+
+
   ## SETTINGS LOAD/SAVE
   def loadSettings(self):
     self.config = configparser.SafeConfigParser(CONFIG_DEFAULT)
@@ -491,19 +492,19 @@ class Interface():
     self.config.read(self.config_file)
     if not CONFIG_SECTION in self.config.sections():
       self.config[CONFIG_SECTION] = {}
-  
+
   def getConfig(self, param):
     return self.config.get(CONFIG_SECTION, param)
-  
+
   def getConfigBool(self, param):
     if self.config.get(CONFIG_SECTION, param).lower() == 'true':
       return True
     else:
       return False
-  
+
   def setConfig(self, param, value):
     self.config[CONFIG_SECTION][param] = str(value)
-  
+
   def saveSettings(self):
     if not self.load_error:
       # read current settings
@@ -512,38 +513,38 @@ class Interface():
       self.setConfigSelectorColour()
       # save
       self.config.write(open(self.config_file, 'w'))
-  
+
   # GET CONFIG
   def getConfigRatio(self):
-    ratio_width = int(self.getConfig('RatioWidth'))
-    ratio_height = int(self.getConfig('RatioHeight'))
+    ratio_width = float(self.getConfig('RatioWidth'))
+    ratio_height = float(self.getConfig('RatioHeight'))
     return ratio_width, ratio_height
-  
+
   def getConfigFixRatio(self):
     return self.getConfigBool('FixRatio')
-  
+
   def getConfigSelectorColour(self):
     r = float(self.getConfig('SelectorR'))
     g = float(self.getConfig('SelectorG'))
     b = float(self.getConfig('SelectorB'))
     return r, g, b
-  
+
   # SET CONFIG
   def setConfigRatio(self):
     ratio_width, ratio_height = self.selector.getRatio()
     self.setConfig('RatioWidth', ratio_width)
     self.setConfig('RatioHeight', ratio_height)
-    
+
   def setConfigFixRatio(self):
     fix = self.selector.getFixRatio()
     self.setConfig('FixRatio', fix)
-  
+
   def setConfigSelectorColour(self):
     r, g, b = self.selector.getColour()
     self.setConfig('SelectorR', r)
     self.setConfig('SelectorG', g)
     self.setConfig('SelectorB', b)
-  
+
   ## INTERFACE SETUP
   def loadAccels(self):
     accels = Gtk.AccelGroup()
@@ -554,52 +555,59 @@ class Interface():
     key, mod = Gtk.accelerator_parse(accelerator)
     accels.connect(key, mod, Gtk.AccelFlags.LOCKED, self.close)
     self.main_window.add_accel_group(accels)
-  
-  def setupRatioSelector(self): 
+
+  def setupRatioSelector(self):
     ratio_entry = self.builder.get_object('RatioEntry')
     ratio_width, ratio_height = self.selector.getRatio()
     ratio_txt = str(ratio_width) + ':' + str(ratio_height)
     ratio_entry.set_active_id(ratio_txt)
     ratio_entry.connect('changed', self.onRatioChanged)
-  
+
   def onRatioChanged(self, widget):
     model = widget.get_model()
     index = widget.get_active()
     el = model[index][0]
     ratio_txt = model[index][1]
-    width, height = ratio_txt.split(':')
-    width = int(width)
-    height = int(height)
+    if ratio_txt == "A4 Paper":
+      width = 1
+      height = math.sqrt(2)
+    elif ratio_txt == "A4 Paper (horizontal)":
+      width = math.sqrt(2)
+      height = 1
+    else:
+      width, height = ratio_txt.split(':')
+      width = int(width)
+      height = int(height)
     self.selector.setRatio(width, height)
     # check selector ratio
     self.selector.checkRatio()
-  
+
   def setupFixRatio(self):
     fix_button = self.builder.get_object('FixRatio')
     fix_button.set_active(self.selector.getFixRatio())
     fix_button.connect('toggled', self.onFixRatioChanged)
-  
+
   def onFixRatioChanged(self, widget):
     if widget.get_active():
       self.selector.fixRatio()
       self.selector.checkRatio()
     else:
       self.selector.fixRatio(False)
-  
+
   def setupSaveButton(self):
     btn = self.builder.get_object('SaveButton')
     btn.connect('clicked', self.saveResized)
-  
+
   def setupColourChooser(self):
     btn = self.builder.get_object('ChooseColourButton')
     colour = self.selector.getColour()
     btn.set_rgba(Gdk.RGBA(*colour))
     btn.connect('color-set', self.changeSelectorColour)
-  
+
   def changeSelectorColour(self, widget):
     r, g, b, a = widget.get_rgba()
     self.selector.setColour((r,g,b))
-  
+
   ## INTERFACE - INFO LABEL
   def showInfoMessage(self, message, duration=2000):
     # InfoBar behaviour depends on the Gtk version in use...
@@ -611,32 +619,32 @@ class Interface():
       self.showInfoBar()
     if duration is not None:
       GObject.timeout_add(duration, self.hideInfoBar)
-  
+
   def showInfoBar(self, *args):
     bar = self.builder.get_object('InfoBar')
     bar.get_action_area().show()
     bar.get_content_area().show()
     return False
-  
+
   def hideInfoBar(self, *args):
     bar = self.builder.get_object('InfoBar')
     bar.get_action_area().hide()
     bar.get_content_area().hide()
     self.hideInfoBarFallback()
     return False
-  
+
   def showInfoBarFallback(self, message):
     fb = self.builder.get_object('InfoBarFallback')
     fb.set_text(message)
     fb.show()
     return False
-  
+
   def hideInfoBarFallback(self, *args):
     fb = self.builder.get_object('InfoBarFallback')
     fb.hide()
     return False
-    
-    
+
+
   ## IMAGE OPERATIONS
   def loadImage(self):
     try:
@@ -647,7 +655,7 @@ class Interface():
       return True
     except Exception:
       return False
-  
+
   def resizeImage(self, pixbuf):
     width = pixbuf.get_width()
     height = pixbuf.get_height()
@@ -658,7 +666,7 @@ class Interface():
     new_width = width * self.scale_factor
     new_height = height * self.scale_factor
     return pixbuf.scale_simple(new_width, new_height, GdkPixbuf.InterpType.BILINEAR)
-  
+
   def loadSelector(self):
     self.selector = Selector(self)
     ratio_w, ratio_h = self.getConfigRatio()
@@ -667,7 +675,7 @@ class Interface():
     self.selector.fixRatio(fix)
     colour = self.getConfigSelectorColour()
     self.selector.setColour(colour)
-  
+
   def loadEvents(self):
     self.main_window.connect("motion-notify-event", self.onMouseMovement)
     eventbox = self.builder.get_object('OverlayEventBox')
@@ -675,12 +683,12 @@ class Interface():
     #eventbox.connect("motion-notify-event", self.onMouseMovement)
     eventbox.connect("button-press-event", self.startDrag)
     eventbox.connect("button-release-event", self.stopDrag)
-    
+
   def getOverlayRelativeCoordinates(self, x, y):
     overlay = self.builder.get_object('Overlay')
     alloc = overlay.get_allocation()
     return x - alloc.x, y - alloc.y
-  
+
   def startDrag(self, widget, event):
     x, y = self.getOverlayRelativeCoordinates(event.x, event.y)
     if self.resize != RESIZE_NONE:
@@ -690,12 +698,12 @@ class Interface():
       self.drag = True
       self.drag_start_position = x, y
       self.setPointerDrag(True)
-  
+
   def stopDrag(self, widget, event):
     self.drag = False
     self.resize_start = False
     self.setPointerDrag(False)
-  
+
   def onMouseMovement(self, widget, event):
     overlay = self.builder.get_object('Overlay')
     alloc = overlay.get_allocation()
@@ -716,7 +724,7 @@ class Interface():
         # resize selector
         position = x, y
         self.resizeSelectorTo(position)
-    
+
   def moveSelectorTo(self, end_pos):
     # calculate new position
     x_s, y_s = self.drag_start_position
@@ -731,7 +739,7 @@ class Interface():
     self.selector.move(new_x, new_y)
     # set new starting position
     self.drag_start_position = end_pos
-  
+
   def resizeSelectorTo(self, end_pos):
     # starting position
     x_s, y_s = self.resize_start_point
@@ -758,13 +766,13 @@ class Interface():
       self.selector.resizeBottomRight(x_e, y_e)
     # set new start position
     self.resize_start_point = end_pos
-  
+
   def setPointerDrag(self, set_drag):
     if set_drag:
       self.changeCursorType(Gdk.CursorType.FLEUR)
     else:
       self.changeCursorType(Gdk.CursorType.LEFT_PTR)
-  
+
   def setPointerResize(self, border_type):
     if border_type == RESIZE_NONE:
       self.changeCursorType(Gdk.CursorType.LEFT_PTR)
@@ -786,16 +794,16 @@ class Interface():
       self.changeCursorType(Gdk.CursorType.BOTTOM_RIGHT_CORNER)
     else:
       self.changeCursorType(Gdk.CursorType.LEFT_PTR)
-  
+
   def resetCursor(self):
     self.changeCursorType(Gdk.CursorType.LEFT_PTR)
-  
+
   def changeCursorType(self, cursor_type):
     window = self.main_window.get_window()
     display = Gdk.Display.get_default()
     cursor = Gdk.Cursor.new_for_display(display, cursor_type)
     window.set_cursor(cursor)
-  
+
   def saveResized(self, *args):
     selector_width, selector_height = self.selector.getSize()
     width, height = selector_width / self.scale_factor, selector_height / self.scale_factor
