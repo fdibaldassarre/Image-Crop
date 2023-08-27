@@ -56,5 +56,12 @@ docs/_build/
 # PyBuilder
 target/
 
+# Pycharm
+.idea
+
+# Env
+venv/
+.venv
+
 # Misc
 OLD/
