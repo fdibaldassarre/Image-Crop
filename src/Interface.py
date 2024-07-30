@@ -484,7 +484,7 @@ class Interface():
 
   ## SETTINGS LOAD/SAVE
   def loadSettings(self):
-    self.config = configparser.SafeConfigParser(CONFIG_DEFAULT)
+    self.config = configparser.ConfigParser(CONFIG_DEFAULT)
     config_folder = os.path.join(os.environ['HOME'], ".config/imc-image-crop/")
     if not os.path.exists(config_folder):
       os.mkdir(config_folder)
